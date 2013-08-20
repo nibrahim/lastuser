@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from coaster import buid
 from lastuserapp import db, app
 from lastuser_core.models import *
 
