@@ -5,7 +5,7 @@ from ..test_db import db, BasicTestFixture
 
 class TestUserModel(BasicTestFixture):
     def setUp(self):
-        super(TestUserModel, self).setUp(5)
+        super(TestUserModel, self).setUp(dict(users=1))
         # self.user = User.query.filter_by()
         print self.users
 
