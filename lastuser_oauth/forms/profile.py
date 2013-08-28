@@ -70,7 +70,8 @@ class ProfileForm(Form):
         if field.data in current_app.config['RESERVED_USERNAMES']:
             raise wtforms.ValidationError("This name is reserved")
         existing = User.query.filter_by(username=field.data).first()
-        if existing is not None and existing.id != self.edit_id:
+        existing_userid = User.query.filter_by(userid=field.data).first()
+        if existing is not None and existing.id != self.edit_id or existing_userid is not None:
             raise wtforms.ValidationError("This username is taken")
         existing = Organization.query.filter_by(name=field.data).first()
         if existing is not None:
