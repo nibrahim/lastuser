@@ -89,19 +89,29 @@ def requires_login(f):
             flash(u"You need to be logged in for that page", "info")
             session['next'] = get_current_url()
             return redirect(url_for('login'))
+        # Check if _reset_password flag is set, if so redirect
+        if g.user._reset_password:
+            flash(u"You need reset the password", "info")
+            session['next'] = get_current_url()
+            return redirect(url_for('lastuser_oauth.reset'))
         return f(*args, **kwargs)
     return decorated_function
 
 
 def requires_login_no_message(f):
     """
-    Decorator to require a login for the given view.
+    Decorator to require a login for the given view without flash message.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if g.user is None:
             session['next'] = get_current_url()
             return redirect(url_for('login'))
+        # Check if _reset_password flag is set, if so redirect
+        if g.user._reset_password:
+            flash(u"You need reset the password", "info")
+            session['next'] = get_current_url()
+            return redirect(url_for('lastuser_oauth.reset'))
         return f(*args, **kwargs)
     return decorated_function
 

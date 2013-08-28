@@ -217,6 +217,9 @@ def reset_email(user, kwargs):
     if form.validate_on_submit():
         user.password = form.password.data
         db.session.delete(resetreq)
+        # set _reset_password to false if it is set to true
+        if user._reset_password:
+            user._reset_password = False
         db.session.commit()
         return render_message(title="Password reset complete", message=Markup(
             'Your password has been reset. You may now <a href="%s">login</a> with your new password.' % escape(url_for('.login'))))

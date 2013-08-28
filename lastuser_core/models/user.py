@@ -28,6 +28,7 @@ class User(BaseMixin, db.Model):
     timezone = db.Column(db.Unicode(40), nullable=True)
     description = db.Column(db.UnicodeText, default=u'', nullable=False)
     status = db.Column(db.SmallInteger, nullable=False, default=USER_STATUS.ACTIVE)
+    _reset_password = db.Column(db.Boolean, nullable=False, default=False)
 
     def __init__(self, password=None, **kwargs):
         self.userid = newid()
