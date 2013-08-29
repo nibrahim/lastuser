@@ -13,7 +13,7 @@ from .. import lastuser_oauth
 from ..mailclient import send_email_verify_link, send_password_reset_link
 from lastuser_core.models import db, User, UserEmailClaim, PasswordResetRequest, Client
 from ..forms import LoginForm, RegisterForm, PasswordResetForm, PasswordResetRequestForm
-from .helpers import login_internal, logout_internal, register_internal, set_loginmethod_cookie
+from .helpers import login_internal, logout_internal, register_internal, set_loginmethod_cookie, check_for_password_reset
 
 oid = OpenID()
 
@@ -50,7 +50,7 @@ def login():
             login_internal(user)
             db.session.commit()
             flash('You are now logged in', category='success')
-            return set_loginmethod_cookie(render_redirect(get_next_url(session=True), code=303),
+            return check_for_password_reset() or set_loginmethod_cookie(render_redirect(get_next_url(session=True), code=303),
                 'password')
     elif request.method == 'POST' and formid in service_forms:
         form = service_forms[formid]['form']
@@ -217,9 +217,9 @@ def reset_email(user, kwargs):
     if form.validate_on_submit():
         user.password = form.password.data
         db.session.delete(resetreq)
-        # set _reset_password to false if it is set to true
-        if user._reset_password:
-            user._reset_password = False
+        # set password_reset_required to false if it is set to true
+        if user.password_reset_required:
+            user.password_reset_required = False
         db.session.commit()
         return render_message(title="Password reset complete", message=Markup(
             'Your password has been reset. You may now <a href="%s">login</a> with your new password.' % escape(url_for('.login'))))

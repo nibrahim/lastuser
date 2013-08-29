@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from coaster.views import get_next_url
 from functools import wraps
 from urllib import unquote
 from urllib2 import urlopen, URLError
@@ -79,22 +80,28 @@ def nossl(url):
     return url
 
 
+def inner_function_for_requires_log(f, *args, **kwargs):
+    """
+    Inner function for requires_login and requires_login_no_message function.
+    """
+    display_flash_message = kwargs.pop('display_flash_message', None)
+    if g.user is None:
+        if display_flash_message:
+            flash(u"You need to be logged in for that page", "info")
+        session['next'] = get_current_url()
+        return redirect(url_for('login'))
+    return f(*args, **kwargs)
+
+
 def requires_login(f):
     """
     Decorator to require a login for the given view.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if g.user is None:
-            flash(u"You need to be logged in for that page", "info")
-            session['next'] = get_current_url()
-            return redirect(url_for('login'))
-        # Check if _reset_password flag is set, if so redirect
-        if g.user._reset_password:
-            flash(u"You need reset the password", "info")
-            session['next'] = get_current_url()
-            return redirect(url_for('lastuser_oauth.reset'))
-        return f(*args, **kwargs)
+        # Set display_flash_messsage
+        kwargs['display_flash_message'] = True
+        return inner_function_for_requires_log(f, *args, **kwargs)
     return decorated_function
 
 
@@ -104,15 +111,7 @@ def requires_login_no_message(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if g.user is None:
-            session['next'] = get_current_url()
-            return redirect(url_for('login'))
-        # Check if _reset_password flag is set, if so redirect
-        if g.user._reset_password:
-            flash(u"You need reset the password", "info")
-            session['next'] = get_current_url()
-            return redirect(url_for('lastuser_oauth.reset'))
-        return f(*args, **kwargs)
+        return inner_function_for_requires_log(f, *args, **kwargs)
     return decorated_function
 
 
@@ -225,3 +224,11 @@ def set_loginmethod_cookie(response, value):
     response.set_cookie('login', value, max_age=31557600,  # Keep this cookie for a year
         expires=datetime.utcnow() + timedelta(days=365))   # Expire one year from now
     return response
+
+
+def check_for_password_reset():
+    # Check if password_reset_required flag is set, if so redirect
+    if g.user.password_reset_required:
+        flash(u"You need to reset the password.", "info")
+        session['next'] = get_next_url(session=True)
+        return redirect(url_for('lastuser_oauth.reset'))

@@ -10,7 +10,7 @@ from lastuser_core.signals import user_data_changed
 from .. import lastuser_oauth
 from ..forms.profile import ProfileMergeForm
 from ..mailclient import send_email_verify_link
-from ..views.helpers import login_internal, register_internal, set_loginmethod_cookie, requires_login
+from ..views.helpers import login_internal, register_internal, set_loginmethod_cookie, requires_login, check_for_password_reset
 
 
 @lastuser_oauth.route('/login/<service>', methods=['GET', 'POST'])
@@ -149,7 +149,7 @@ def login_service_postcallback(service, userdata):
     if 'merge_userid' in session:
         return set_loginmethod_cookie(redirect(url_for('.profile_merge', next=login_next), code=303), service)
     else:
-        return set_loginmethod_cookie(redirect(login_next, code=303), service)
+        return check_for_password_reset() or set_loginmethod_cookie(redirect(login_next, code=303), service)
 
 
 @lastuser_oauth.route('/profile/merge', methods=['GET', 'POST'])
