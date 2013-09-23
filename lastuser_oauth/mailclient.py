@@ -14,6 +14,7 @@ def send_email_verify_link(useremail):
     msg = Message(subject="Confirm your email address",
         recipients=[useremail.email])
     msg.body = render_template("emailverify.md", useremail=useremail)
+    print msg.body
     msg.html = markdown(msg.body)
     mail.send(msg)
 
@@ -22,5 +23,6 @@ def send_password_reset_link(email, user, secret):
     msg = Message(subject="Reset your password",
         recipients=[email])
     msg.body = render_template("emailreset.md", user=user, secret=secret)
+    print msg.body
     msg.html = markdown(msg.body)
     mail.send(msg)
