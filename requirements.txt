@@ -16,6 +16,7 @@ blinker
 Flask-RQ
 tweepy
 psycopg2
+gunicorn
 https://github.com/hasgeek/coaster/archive/master.zip
 https://github.com/hasgeek/baseframe/archive/master.zip
 https://github.com/jace/flask-alembic/archive/master.zip
