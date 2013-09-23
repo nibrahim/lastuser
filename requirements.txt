@@ -1,5 +1,6 @@
 Flask
 markdown
+Flask-Script==0.5.3
 Flask-Assets
 Flask-Mail
 Flask-SQLAlchemy
@@ -13,7 +14,6 @@ Flask-WTF
 requests
 blinker
 Flask-RQ
-Flask-Script
 tweepy
 https://github.com/hasgeek/coaster/archive/master.zip
 https://github.com/hasgeek/baseframe/archive/master.zip
