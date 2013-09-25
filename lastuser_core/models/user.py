@@ -70,9 +70,9 @@ class User(BaseMixin, db.Model):
         if self.pw_hash.startswith('sha1$'):
             return check_password_hash(self.pw_hash, password)
         else:
-            return bcrypt.hashpw(
-                password.encode('utf-8') if isinstance(password, unicode) else password,
-                self.pw_hash) == self.pw_hash
+            pw = password.encode('utf-8') if isinstance(password, unicode) else password
+            pw_hash = self.pw_hash.encode('utf-8') if isinstance(self.pw_hash, unicode) else self.pw_hash
+            return bcrypt.hashpw(pw, pw_hash) == self.pw_hash
 
     def __repr__(self):
         return '<User %s "%s">' % (self.username or self.userid, self.fullname)
